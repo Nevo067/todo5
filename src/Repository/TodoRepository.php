@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Todo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Client\Curl\User;
 
 /**
  * @method Todo|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +48,13 @@ class TodoRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function findTodoByUser(int $idUser)
+    {
+        $query =$this->createQueryBuilder('t')
+            ->innerJoin('t.user','us')
+            ->where('us.id = :id')
+            ->setParameter(':id',$idUser)
+            ->getQuery();
+        return $query->execute();
+    }
 }
