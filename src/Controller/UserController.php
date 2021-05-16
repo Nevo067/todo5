@@ -3,15 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use APP\Repository\UserRepository;
+use App\Repository\UserRepository;
 use phpDocumentor\Reflection\Types\Integer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UserController extends AbstractController
 {
@@ -22,7 +22,7 @@ class UserController extends AbstractController
             'controller_name' => 'UserController',
         ]);
     }
-    #[Route('/User/post', methods: ['POST'])]
+    #[Route('/user/post', methods: ['POST'])]
     public function post(Request $request) : Response
     {
         $encoders =  [new JsonEncoder()];
@@ -46,7 +46,7 @@ class UserController extends AbstractController
         return new Response();
 
     }
-    #[Route('/User/update/{id}', methods: ['POST'])]
+    #[Route('/user/update/{id}', methods: ['POST'])]
     public function update(Request $request,int $id) : Response
     {
         $encoders =  [new JsonEncoder()];
@@ -57,9 +57,11 @@ class UserController extends AbstractController
         $content = $serializer->deserialize($contentJson,User::class,'json');
 
         $entityManager = $this->getDoctrine()->getManager();
-        $user = $entityManager()->getRepository(User::class)->findById($id);
+        $user = $entityManager->getRepository(User::class)->findById($id);
 
         $user->setLogin($content->getLogin());
+        $user->setPassword($content->getPassword());
+        $user->setPseudo($content->getPseudo());
         $entityManager->flush($user);
         
         return new Response();
@@ -67,23 +69,24 @@ class UserController extends AbstractController
 
 
     }
-    #[Route('/User/delete/{id}', methods: ['GET'])]
+    #[Route('/user/delete/{id}', methods: ['GET'])]
     public function delete(int $id) : Response
     {
         $encoders =  [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers,$encoders);
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $user = $entityManager()->getRepository(User::class)->findById($id);
+        $entityManager = $this->getDoctrine();
+        $user = $entityManager->getRepository(User::class)->findById($id);
 
-        $entityManager->remove($user);
-        $entityManager->flush($user);
+        $em = $entityManager->getManager();
+        $em->remove($user);
+        $em->flush();
         
         return new Response();
     }
-    #[Route('/User/', methods: ['POST'])] 
-    public function getByLoginAndPassword(Request $request,string $login,string $password) : Response
+    #[Route('/user/', methods: ['POST'])] 
+    public function getByLoginAndPassword(Request $request) : Response
     {
         $encoders =  [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
@@ -92,11 +95,13 @@ class UserController extends AbstractController
         $contentJson = $request->getContent();
         $content = $serializer->deserialize($contentJson,User::class,'json');
 
-        $entityManager = $this->getDoctrine()->getManager();
+        echo get_class($this->getDoctrine()->getRepository(User::class));
 
-        $user = $entityManager()->getRepository(User::class)
-        ->findByLoginAndPassword($content->getLogin(),$content->getPassword());
-
+        $user = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->findUserByLoginAndPassword($content->getLogin(),$content->getPassword());
+        //->findByLoginAndPassword($content->getLogin(),$content->getPassword());
+        echo $serializer->serialize($user,'json');
         return new Response();
     }
 
