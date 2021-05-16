@@ -48,4 +48,29 @@ class UserRepository extends ServiceEntityRepository
         ;
     }
     */
+    //find the user by his id and password
+    public function findUserByLoginAndPassword(string $login,string $password)
+    {
+        //Command sql
+        $command = $this->createQueryBuilder('p')
+        ->andWhere('p.password LIKE :password')
+        ->andWhere('p.login LIKE :login')
+        ->setParameter(':login',$login)
+        ->setParameter(':password',$password);
+
+        $query = $command->getQuery();
+        //execute the sql command
+        return $query->execute();
+    }
+    //find the user by his id
+    public function findById(int $id):User
+    {
+        $command = $this->createQueryBuilder('p')
+        ->where('p.id = :id')
+        ->setParameter(':id',$id);
+
+        $query = $command->getQuery();
+        return $query->execute();
+    }
+    
 }
