@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TodoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ORM\Entity(repositoryClass=TodoRepository::class)
@@ -30,6 +31,7 @@ class Todo
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="listTodo")
      * @ORM\JoinColumn(nullable=false)
+     * @MaxDepth(2)
      */
     private $user;
 

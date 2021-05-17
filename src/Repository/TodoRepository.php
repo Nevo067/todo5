@@ -50,11 +50,18 @@ class TodoRepository extends ServiceEntityRepository
     */
     public function findTodoByUser(int $idUser)
     {
+        /*
         $query =$this->createQueryBuilder('t')
             ->innerJoin('t.user','us')
             ->where('us.id = :id')
             ->setParameter(':id',$idUser)
             ->getQuery();
         return $query->execute();
+        */
+        $query = $this->createQueryBuilder('t')
+            ->join('t.user','us')
+            ->getQuery();
+        return $query->getResult();
+
     }
 }

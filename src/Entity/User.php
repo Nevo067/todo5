@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -36,6 +37,7 @@ class User
 
     /**
      * @ORM\OneToMany(targetEntity=Todo::class, mappedBy="user", orphanRemoval=true)
+     * @MaxDepth(2)
      */
     private $listTodo;
 

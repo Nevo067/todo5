@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -68,7 +69,7 @@ class TodoController extends AbstractController
         $todo = $entityManager->getRepository(Todo::class)->find($id);
 
         $todo->setName($content->getName());
-        $todo->setDescription($content->getPassword());
+        $todo->setDescription($content->getDescription());
 
         $entityManager->flush($todo);
 
@@ -82,7 +83,7 @@ class TodoController extends AbstractController
         $serializer = new Serializer($normalizers,$encoders);
 
         $entityManager = $this->getDoctrine();
-        $todo = $entityManager->getRepository(Todo::class)->findById($id);
+        $todo = $entityManager->getRepository(Todo::class)->find($id);
 
         $em = $entityManager->getManager();
         $em->remove($todo);
@@ -100,13 +101,22 @@ class TodoController extends AbstractController
         $contentJson = $request->getContent();
         $content = $serializer->deserialize($contentJson,Todo::class,'json');
 
-        echo get_class($this->getDoctrine()->getRepository(User::class));
+
 
         $user = $this->getDoctrine()
             ->getRepository(Todo::class)
             ->findTodoByUser($id);
+        //echo $serializer->normalize($user, 'json', [AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true]);
         //->findByLoginAndPassword($content->getLogin(),$content->getPassword());
-        echo $serializer->serialize($user,'json');
+
+        echo $serializer->serialize($user, 'json', ['circular_reference_handler'
+        => function ($object) {
+                return $object->getId();
+            }
+        ]);
+        
+
+
         return new Response();
     }
 }
