@@ -37,7 +37,7 @@ class User
 
     /**
      * @ORM\OneToMany(targetEntity=Todo::class, mappedBy="user", orphanRemoval=true)
-     * @MaxDepth(2)
+     * @MaxDepth(1)
      */
     private $listTodo;
 

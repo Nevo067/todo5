@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Todo;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use PhpParser\Node\Stmt\Echo_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,6 +56,27 @@ class TodoController extends AbstractController
         return new Response();
 
     }
+    #[Route('/todo/test/post', methods: ['POST'])]
+    public function testPostTodo(Request $request,UserRepository $userRepository)
+    {
+        $contentJson = $request->getContent();
+        echo $contentJson;
+        echo 1;
+        $content1 = json_decode($contentJson,true);
+        var_dump($content1);
+        $todo = new Todo();
+        $todo->deserialise($userRepository,$content1);
+        var_dump($todo->serialise());
+
+        $em = $this->getDoctrine()->getManager();
+        //$em->persist($user);
+        $em->persist($todo);
+        $em->flush();
+
+        return new Response();
+
+
+    }
     #[Route('/todo/update/{id}', methods: ['POST'])]
     public function update(Request $request,int $id)
     {
@@ -92,28 +114,42 @@ class TodoController extends AbstractController
         return new Response();
     }
     #[Route('/todo/get/{id}', methods: ['GET'])]
-    public function getByLoginAndPassword(Request $request,int $id) : Response
+    public function getTodoByIdUser(Request $request,int $id,UserRepository $userRepository) : Response
     {
         $encoders =  [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers,$encoders);
 
         $contentJson = $request->getContent();
-        $content = $serializer->deserialize($contentJson,Todo::class,'json');
+//        $content = $serializer->deserialize($contentJson,Todo::class,'json');
+        /*
+        $user = $userRepository->find($id);
+        dump($user);
+        die();
+        */
 
 
-
-        $user = $this->getDoctrine()
+        $todos = $this->getDoctrine()
             ->getRepository(Todo::class)
             ->findTodoByUser($id);
         //echo $serializer->normalize($user, 'json', [AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true]);
         //->findByLoginAndPassword($content->getLogin(),$content->getPassword());
-
-        echo $serializer->serialize($user, 'json', ['circular_reference_handler'
+        /*
+        echo $serializer->serialize($todos, 'json', ['circular_reference_handler'
         => function ($object) {
                 return $object->getId();
             }
         ]);
+        */
+
+        $todosJson = [];
+        foreach ($todos as  $todo)
+        {
+            array_push($todosJson,$todo->serialise());
+        }
+        echo json_encode($todosJson);
+
+
         
 
 
