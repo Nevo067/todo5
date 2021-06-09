@@ -33,13 +33,11 @@ class TodoController extends AbstractController
         $serializer = new Serializer($normalizers,$encoders);
         $contentJson = $request->getContent();
         $content1 = json_decode($contentJson,true);
-        $id = $content1['user_id'];
+        $id = $content1['user'];
 
         $manager = $this->getDoctrine();
         //echo get_class($manager->getRepository(Todo::class)->find(1));
         $user = $manager->getRepository(User::class)->find($id);
-        echo($content1['user_id']);
-        echo($content1['user_id']);
         //$content = $serializer->deserialize($contentJson,Todo::class,'json');
         //$content->setUser($user);
 
@@ -49,9 +47,11 @@ class TodoController extends AbstractController
         $todos->setUser($user);
         
         $em = $this->getDoctrine()->getManager();
-        //$em->persist($user);
+
         $em->persist($todos);
         $em->flush();
+
+        echo json_encode($todos->serialise());
 
         return new Response();
 
@@ -78,21 +78,20 @@ class TodoController extends AbstractController
 
     }
     #[Route('/todo/update/{id}', methods: ['POST'])]
-    public function update(Request $request,int $id)
+    public function update(Request $request,int $id,UserRepository $userRepository)
     {
-        $encoders =  [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers,$encoders);
 
         $contentJson = $request->getContent();
-        $content = $serializer->deserialize($contentJson,Todo::class,'json');
+        $newTodo = new Todo();
+        $content = json_decode($contentJson);
+        $newTodo->deserialise($userRepository,$content);
 
         $entityManager = $this->getDoctrine()->getManager();
         $todo = $entityManager->getRepository(Todo::class)->find($id);
 
-        $todo->setName($content->getName());
-        $todo->setDescription($content->getDescription());
-
+        $todo->setName($newTodo->getName());
+        $todo->setDescription($newTodo->getDescription());
+        //echo json_encode($todo->serialise());
         $entityManager->flush($todo);
 
         return new Response();
@@ -106,7 +105,7 @@ class TodoController extends AbstractController
 
         $entityManager = $this->getDoctrine();
         $todo = $entityManager->getRepository(Todo::class)->find($id);
-
+        echo ($todo != NULL);
         $em = $entityManager->getManager();
         $em->remove($todo);
         $em->flush();

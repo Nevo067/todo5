@@ -116,4 +116,37 @@ class User
 
         return $this;
     }
+    public function serialise()
+    {
+        $FIELD_ID = "id";
+        $FIELD_LOGIN="login";
+        $FIELD_PASSWORD ="password";
+        $FIELD_PSEUDO = "pseudo";
+        /*return "{id:".$this->getId().",name:".$this->getName().",description:".$this->getDescription().",user".$this->getUser()->getId()."}";
+        */
+        $tabJson = array();
+        $tabJson[$FIELD_ID] = $this->getId();
+        $tabJson[$FIELD_LOGIN] = $this->getLogin();
+        $tabJson[$FIELD_PASSWORD] = $this->getPassword();
+        $tabJson[$FIELD_PSEUDO] = $this->getPseudo();
+        return $tabJson;
+
+    }
+    public function deserialise(array $json)
+    {
+        $FIELD_ID = "id";
+        $FIELD_LOGIN="login";
+        $FIELD_PASSWORD ="password";
+        $FIELD_PSEUDO = "pseudo";
+
+
+
+        $this->setLogin($json[$FIELD_LOGIN]);
+        $this->setPassword($json[$FIELD_PASSWORD]);
+        $this->setPseudo($json[$FIELD_PSEUDO]);
+
+
+
+    }
+
 }

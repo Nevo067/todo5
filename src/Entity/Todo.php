@@ -92,18 +92,18 @@ class Todo
         return $tabJson;
 
     }
-    public function deserialise(UserRepository $userRepository,array $json)
+    public function deserialise(UserRepository $userRepository, $json)
     {
         $FIELD_NAME="name";
         $FIELD_DESC ="description";
         $FIELD_USER = "user";
 
         echo 5;
-        echo gettype($json[$FIELD_DESC]);
+        echo gettype($json->description);
 
-        $this->setName($json[$FIELD_NAME]);
-        $this->setDescription($json[$FIELD_DESC]);
-        $this->setUser($userRepository->find($json[$FIELD_USER]));
+        $this->setName($json->name);
+        $this->setDescription($json->description);
+        $this->setUser($userRepository->find($json->user));
 
     }
 }

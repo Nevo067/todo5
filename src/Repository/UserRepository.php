@@ -31,7 +31,7 @@ class UserRepository extends ServiceEntityRepository
 
         $query = $command->getQuery();
         //execute the sql command
-        return $query->execute();
+        return $query->getSingleResult();
     }
     //find the user by his id
     public function findById(int $id):User

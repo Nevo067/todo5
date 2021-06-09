@@ -95,13 +95,15 @@ class UserController extends AbstractController
         $contentJson = $request->getContent();
         $content = $serializer->deserialize($contentJson,User::class,'json');
 
-        echo get_class($this->getDoctrine()->getRepository(User::class));
+        //echo get_class($this->getDoctrine()->getRepository(User::class));
+
 
         $user = $this->getDoctrine()
             ->getRepository(User::class)
             ->findUserByLoginAndPassword($content->getLogin(),$content->getPassword());
         //->findByLoginAndPassword($content->getLogin(),$content->getPassword());
-        echo $serializer->serialize($user,'json');
+        echo json_encode($user->serialise());
+
         return new Response();
     }
 
