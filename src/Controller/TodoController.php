@@ -154,4 +154,11 @@ class TodoController extends AbstractController
 
         return new Response();
     }
+    #[Route('api/test', methods: ['GET'])]
+    public function test()
+    {
+        return $this->json([
+            'message' => 'test!',
+        ]);
+    }
 }

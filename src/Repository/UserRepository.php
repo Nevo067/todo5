@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,7 +33,11 @@ class UserRepository extends ServiceEntityRepository
 
         $query = $command->getQuery();
         //execute the sql command
-        return $query->getSingleResult();
+        try {
+            return $query->getSingleResult();
+        } catch (NoResultException | NonUniqueResultException $e) {
+            return null;
+        }
     }
     //find the user by his id
     public function findById(int $id):User
