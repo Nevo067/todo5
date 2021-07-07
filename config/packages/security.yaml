@@ -11,10 +11,10 @@ security:
             lazy: true
             provider: users_in_memory
 
-            pattern: ^/api
-            guard:
-                authenticator:
-                    -App\Security\JwtAuthenticator
+            #pattern: ^/api
+            #guard:
+                #authenticator:
+                    #-App\Security\JwtAuthenticator
     encoders:
         App\Entity\User:
             algorithm: bcrypt
